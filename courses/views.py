@@ -22,6 +22,7 @@ import json
 from django.views import View
 from django.http import JsonResponse
 from .models import CompletedLesson, Course
+from .models import CompletedCourse
 from .forms import CreateChapterForm, CreateLessonForm, UpdateChapterForm, UpdateLessonForm, UpdateCourseForm
 import mammoth
 from django.views.decorators.csrf import csrf_protect
@@ -33,6 +34,7 @@ from django.http import Http404
 from assignments import models
 from assignments.models import QuizSubmission, UserProfile
 from django.db.models import Count
+from django.db import IntegrityError
 
 # Create your views here.
 class CreateCourse(LoginRequiredMixin, generic.CreateView):
@@ -103,6 +105,8 @@ class CourseDetail(generic.DetailView):
     model = Course
     
     def get_context_data(self, **kwargs):
+        # Get the completed courses for the user
+        completed_courses = CompletedCourse.objects.filter(user=self.request.user).select_related('course')
          # Initialize user_profile
         user_profile = None
         try:
@@ -228,8 +232,12 @@ class CourseDetail(generic.DetailView):
             if total_chapters == completed_chapters_count:
                 completed_courses.append(course)
 
+            print(f"Completed Course Details: {course.course_name}, {course.id}, ...")  # Include other attributes
+
+
             print("Completed Courses:", completed_courses)
-                   
+
+                               
 
             print("Chapters with completion:", chapters_with_completion)
                 
@@ -249,7 +257,7 @@ class CourseDetail(generic.DetailView):
             print("Completed Quizzeddds:", completed_quizzes_ids)
 
             completed_quizzes_count = len(completed_quizzes)
-            completed_lessons = CompletedLesson.objects.filter(user=user_id, lesson__chapter__course=course).count()
+            
 
             # calculate if a course is complete or not if the total_lessons + total_quizes == the sum of completed lessons + completed quizes          
             if total_lessons + total_quizzes == completed_lessons + completed_quizzes_count:
@@ -270,7 +278,7 @@ class CourseDetail(generic.DetailView):
             #this is how i choose to update to the db that a user has completed a course
             # popup a congratulations window with instructions to generate/get your certificate
             # Check if the user has already completed the course
-            if not CompletedCourse.objects.filter(user_id, course=course).exists():
+            if not CompletedCourse.objects.filter(user_id=user_id, course=course).exists():
                 # Create a new CompletedCourse instance only if it doesn't exist
                 try:
                     completedcourse = CompletedCourse(user_id, course=course)
@@ -413,6 +421,20 @@ class UpdateLessonView(LoginRequiredMixin, generic.UpdateView):
             form.add_error(None, "You don't have permission to edit this lesson.")
             return self.form_invalid(form)
         
+def profile_view(request):
+    if request.user.is_authenticated and request.user.userprofile.user_type == 1:
+        # Get completed courses for the logged-in user
+        completed_courses = CompletedCourse.objects.filter(user=request.user)
+        print("djejed:",completed_courses)
+        context = {
+            'completed_courses': completed_courses
+        }
+
+        return render(request, 'user_profile.html', context)
+    else:
+        # Handle the case where the user is not authenticated or not of type 1
+        return render(request, 'user_profile.html')
+        
 def certificate_view(request, course_id):
     user = request.user
     course = get_object_or_404(Course, pk=course_id)
@@ -489,17 +511,11 @@ def get_completed_lessons_count(request, course_id):
         return JsonResponse(context)
     else:
         return JsonResponse({'message': 'Invalid request method.'}, status=400)
-# class CompletedLessonCountView(View):
-#     def get(self, request, *args, **kwargs):
-#         course_pk = self.kwargs['pk']  # Access the 'pk' parameter from the URL
-#         # Your logic to calculate completed lesson count
-#         course = get_object_or_404(Course, pk=course_pk)
-#         completed_lessons_count = request.user.completed_lessons.filter(
-#             lesson__chapter__course=course
-#         ).count()
-#         data = {'completed_lessons_count': completed_lessons_count}
-#         return JsonResponse(data)
+
         
+import logging
+
+logger = logging.getLogger(__name__)
 
 def mark_lesson_as_complete(request):
     if request.method != 'POST':
@@ -521,26 +537,29 @@ def mark_lesson_as_complete(request):
 
     user = request.user
 
-    # Check if the lesson is already marked as complete for the user
-    if CompletedLesson.objects.filter(user=user, lesson=lesson).exists():
+    # Ensure you get the correct enrollment based on your application logic
+    try:
+        enrollment = Enrollment.objects.get(student=user, course=lesson.chapter.course)
+    except Enrollment.DoesNotExist:
+        return JsonResponse({'message': 'Enrollment not found.'}, status=404)
+
+    
+    try:
+    # Check if a CompletedLesson with the same user, lesson, and enrollment already exists
+        completed_lesson = CompletedLesson.objects.get(user=user, lesson=lesson, enrollment=enrollment)
+
+        # If it exists, handle accordingly
         return JsonResponse({'message': 'Lesson is already marked as complete.'}, status=200)
 
-    # Mark the lesson as complete for the user
-    completed_lesson = CompletedLesson(user=user, lesson=lesson)
-    completed_lesson.save()
+    except CompletedLesson.DoesNotExist:
+        # Entry does not exist, proceed to save
+        completed_lesson = CompletedLesson(user=user, lesson=lesson, enrollment=enrollment)
+        completed_lesson.save()
 
-    # Calculate the completion percentage for the course
-    course = lesson.chapter.course
-    total_lessons = Lesson.objects.filter(chapter__course=course).count()
-    total_quizzes = course.total_quizzes()
-    completed_lessons = user.completed_lessons.filter(lesson__chapter__course=course).count()
-    completed_quizzes = user.completed_quizzes(course)
-    completion_percentage = round(((completed_lessons + completed_quizzes) / (total_lessons + total_quizzes)) * 100)
-    print("completed quizes: ", completed_quizzes)
+    return JsonResponse({
+        'message': 'Lesson marked as complete successfully.',
+    }, status=200)
 
-    # Update the progress bar or any other elements as needed
-
-    return JsonResponse({'message': 'Lesson marked as complete successfully.', 'completed_lessons_count': completed_lessons, 'completion_percentage': completion_percentage}, status=200)
 
 
 @csrf_protect

@@ -9,7 +9,7 @@
     
 
 {% block body_content %}
-    <div class="mt-[150px] ml-3 w-[72%] text-cyan-950 font-serif bg-transparent overflow-auto h-[850px]">
+    <div class="mt-[150px] ml-3 w-[72%] text-cyan-950 font-serif bg-transparent overflow-auto h-auto">
         {% if user.is_authenticated %}
             <i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i>
             {% comment %} <p>{{ user.}}</p> {% endcomment %}
@@ -71,9 +71,9 @@
                         <div class="card-body p-4">
                           <h5 class="card-title">{{course.course_name}}</h5>
                           <h6 class="card-subtitle mb-2 text-muted">{{course.teacher}}</h6>
-                          <p class="card-text">
+                          {% comment %} <p class="card-text">
                             {{course.course_description}}
-                          </p>
+                          </p> {% endcomment %}
                           <a href="{% url 'courses:detail' pk=course.pk %}" class="bg-blue-950 text-white m-2 p-2 hover:bg-yellow-400 rounded-md text-md font-extrabold hover:no-underline">More Info</a>
                           <a href="{% url 'courses:unenroll' pk=course.pk %}" class="bg-red-600 m-2 text-white hover:bg-red-800 p-2 rounded-md text-md font-extrabold hover:no-underline">Unenroll</a>
                           <p class="m-2">{{course.students.count}} member{{course.students.count|pluralize}}</p>
@@ -91,26 +91,17 @@
             {% if user.user_type == 1 and user.is_authenticated %}
             <!-- New section for completed courses -->
             <h3 class="font-sans text-2xl text-cyan-950 mt-5">My Achievements</h3>
-            {% comment %} {% for course in completed_courses %} {% endcomment %}
-            <div class="bg-green-500 m-2 shadow-md rounded-md" style="width: 20rem">
-                <div class="card-image">
-                  <!-- Place your image here -->
-                  <img src="{% static 'django_lms/images/achievement_image.jpg' %}" alt="Achievement Image" class="w-full h-50 object-cover rounded-t-md" />
-                </div>
-                <div class="card-body p-4">
-                    {% for completed_course in completed_courses %}
-                        <h5 class="card-title text-red-900">{{ course.course_name }}</h5>
-                        <p>Debug: {{ course }}</p>
-                    {% endfor %}
-                  <p class="card-text">
-                    Congratulations! You have successfully completed this course.
-                  </p>
-                  <!-- Additional details or buttons can be added here -->
-                  {% comment %} <a href="{% url 'courses:detail' pk=course.pk %}" class="text-blue-500 hover:underline">View Course</a> {% endcomment %}
-                </div>
-            </div>
-        {% comment %} {% endfor %} {% endcomment %}
+            <p>Debug: Completed Courses Exist</p>
+            {% for completed_course in completed_courses %}
+                <p class="text-cyan-950 text-xl">{{ completed_course.course_name }}</p>
+            {% endfor %}
+            <p>Debug: Total Completed Courses: {{ completed_courses|length }}</p>
         {% endif %}
+        
+
+
+
+
             {% endif %}
         {% else %}
             <div class="jumbotron">
