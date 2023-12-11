@@ -150,7 +150,6 @@
         {% endif %}
         {% comment %} {% if user.is_authenticated %} {% endcomment %}
             <a href="{% url 'home' %}" class="hover:text-yellow-500 mb-3 mt-3 hover:no-underline text-cyan-950 font-extrabold"><i class="fa fa-home" aria-hidden="true"></i>Home</a>
-            {% comment %} <a href="{% url 'courses:list' %}" class="text-black font-extrabold"><i class="fa fa-list-ul text-white font-extrabold" aria-hidden="true"></i>All Courses</a> {% endcomment %}
             {% if user.user_type == 1 %}
             <!-- Your Courses -->
             <a href="#" class="hover:text-yellow-500 hover:no-underline text-cyan-950 font-extrabold"><i class="fa fa-list courses-icon" aria-hidden="true"></i>Your Courses</a>
