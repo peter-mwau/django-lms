@@ -2324,6 +2324,10 @@ video {
     height: 900px;
   }
 
+  .lg\:h-\[90vh\] {
+    height: 90vh;
+  }
+
   .lg\:w-\[250px\] {
     width: 250px;
   }
@@ -2358,6 +2362,10 @@ video {
 
   .lg\:w-auto {
     width: auto;
+  }
+
+  .lg\:w-1\/2 {
+    width: 50%;
   }
 
   .lg\:max-w-\[70\%\] {
