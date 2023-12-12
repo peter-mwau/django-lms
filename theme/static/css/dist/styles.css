@@ -2300,6 +2300,10 @@ video {
     margin-top: 150px;
   }
 
+  .lg\:ml-3 {
+    margin-left: 0.75rem;
+  }
+
   .lg\:flex {
     display: flex;
   }
@@ -2422,6 +2426,10 @@ video {
 
   .lg\:p-5 {
     padding: 1.25rem;
+  }
+
+  .lg\:p-4 {
+    padding: 1rem;
   }
 }
 
