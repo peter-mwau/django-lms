@@ -101,7 +101,7 @@
     </div>
     {% endif %}
     {% if user.is_authenticated %}
-    <div id="chatbot-sidenav" class="h-[890px] w-[20%] bg-cyan-950 top-[145px] fixed shadow-2xl right-0 justify-end mx-auto mr-0 rounded-md scroll-auto hidden" style="z-index: 1000;">
+    <div id="chatbot-sidenav" class="lg:h-[890px] h-[740px] lg:w-[20%] w-[385px] bg-cyan-950 top-[145px] lg:fixed absolute shadow-2xl lg:right-0 left-2 lg:justify-end lg:mx-auto lg:mr-0 rounded-md scroll-auto hidden" style="z-index: 1000;">
         <img src="{% static 'django_lms/images/close-final.png' %}" alt="close" onclick="toggleChatbot()" class="w-10 h-10 left-0 hover:cursor-pointer flex items-start justify-start  m-2"/>
         {% comment %} <button onclick="toggleChatbot()" class="flex items-start justify-start m-2 bg-red-500 p-2 rounded-xl hover:cursor-pointer font-sans font-semibold text-lg shadow-xl">Close</button> {% endcomment %}
         <h2 class="items-center justify-center mx-auto flex text-2xl font-sans font-semibold bg-gray-300 m-2 w-full  p-2 rounded-lg">ABYA Chatbot</h2>
