@@ -995,6 +995,10 @@ video {
   height: 100vh;
 }
 
+.h-\[100vhvh\] {
+  height: 100vhvh;
+}
+
 .w-0 {
   width: 0px;
 }
@@ -2304,6 +2308,18 @@ video {
     margin-left: 0.75rem;
   }
 
+  .lg\:mt-\[80px\] {
+    margin-top: 80px;
+  }
+
+  .lg\:mt-\[10px\] {
+    margin-top: 10px;
+  }
+
+  .lg\:mt-\[5px\] {
+    margin-top: 5px;
+  }
+
   .lg\:flex {
     display: flex;
   }
@@ -2326,6 +2342,10 @@ video {
 
   .lg\:h-\[90vh\] {
     height: 90vh;
+  }
+
+  .lg\:h-\[850px\] {
+    height: 850px;
   }
 
   .lg\:w-\[250px\] {

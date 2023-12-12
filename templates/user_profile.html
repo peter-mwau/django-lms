@@ -10,7 +10,7 @@
     
 
 {% block body_content %}
-    <div class="mt-[150px] ml-3 w-[72%] text-cyan-950 font-serif bg-transparent overflow-auto h-[850px]">
+    <div class="lg:mt-[150px] mt-[120px] lg:ml-3 lg:w-[72%] w-auto absolute lg:relative left-2 text-cyan-950 font-serif bg-transparent overflow-auto lg:h-[850px] h-auto">
         {% if user.is_authenticated %}
             <i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i>
             {% comment %} <p>{{ user.}}</p> {% endcomment %}
