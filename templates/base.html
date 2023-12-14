@@ -237,17 +237,19 @@
             
 
             {% else %}
+                <div class="flex flex-col">
                 <a href="{% url 'courses:create' %}" class="text-cyan-950 hover:text-yellow-500 hover:cursor-pointer hover:no-underline hover:shadow-md p-2"><i class="fa fa-plus-circle" aria-hidden="true" style="color: #052635;font-size: 20px;"></i> Create New Course</a>
                 <a href="{% url 'courses:create_chapter' %}" class="text-cyan-950 hover:text-yellow-500 hover:cursor-pointer hover:no-underline hover:shadow-md p-2"><i class="fa fa-plus-circle" aria-hidden="true" style="color: #052635;font-size: 20px;"></i> Create New Chapter</a>
                 <a href="{% url 'courses:create_lesson' %}" class="text-cyan-950 hover:text-yellow-500 hover:cursor-pointer hover:no-underline hover:shadow-md p-2"><i class="fa fa-plus-circle" aria-hidden="true" style="color: #052635;font-size: 20px;"></i> Create New Lesson</a>
                 <a href="{% url 'assignments:create' %}" class="text-cyan-950 hover:text-yellow-500 hover:cursor-pointer hover:no-underline hover:shadow-md p-2"><i class="fa fa-plus-circle" aria-hidden="true" style="color: #052635;font-size: 20px;"></i> Create New Assignment</a>
                 <a href="{% url 'assignments:create' %}" class="text-cyan-950 hover:text-yellow-500 hover:cursor-pointer hover:no-underline hover:shadow-md p-2"><i class="fa fa-plus-circle" aria-hidden="true" style="color: #052635;font-size: 20px;"></i> Create New Resource</a>
                 <a href="{% url 'assignments:create_quiz' %}" class="text-cyan-950 hover:text-yellow-500 hover:cursor-pointer hover:no-underline hover:shadow-md p-2"><i class="fa fa-plus-circle" aria-hidden="true" style="color: #777777;font-size: 20px;"></i> Create New Quiz</a>
+                </div>
                 <span class="sidemenu text-cyan-950 font-extrabold"><h5 id="side-head" class="text-cyan-950"><i class="fa fa-list courses-icon text-cyan-950" aria-hidden="true" style="color: #052635;font-size: 20px;"></i>Your Courses</h5></span>
                 {% for course in list_courses %}
                     
                     {% if user.id == course.teacher.id %}
-                        <span class="course-item ml-4"><a href="{% url 'courses:detail' pk=course.pk %}" class="text-cyan-950 hover:text-yellow-500">{{course}}</a></span>
+                        <span class="course-item ml-4 flex flex-col"><a href="{% url 'courses:detail' pk=course.pk %}" class="text-cyan-950 hover:text-yellow-500">{{course}}</a></span>
                     {% endif %}
                         
                 {% endfor %}                 
