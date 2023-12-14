@@ -103,11 +103,11 @@
     {% if course.teacher.id == user.id or user in course.students.all %}
         {% if user.user_type == 2 %}
             <a href="{% url 'assignments:create' %}"
-                class="bg-yellow-500 rounded-md font-semibold text-black hover:text-white hover:bg-black p-2 m-2 shadow-lg text-2xl">
+                class="bg-yellow-500 rounded-md font-semibold text-cyan-950 hover:text-white hover:bg-cyan-950 p-2 m-2 shadow-lg text-2xl">
                 <i class="fa fa-plus-circle" aria-hidden="true"> Create New Assignment</i>
             </a>
             <a href="{% url 'resources:create' %}"
-                class="bg-blue-900 rounded-md font-semibold text-white hover:text-black hover:shadow-xl hover:bg-gray-400 p-2 m-2 shadow-lg text-2xl">
+                class="bg-cyan-950 rounded-md font-semibold text-white hover:text-black hover:shadow-xl hover:bg-gray-400 p-2 m-2 shadow-lg text-2xl">
                 <i class="fa fa-plus-circle" aria-hidden="true"> Create New Resource</i>
             </a>
         {% endif %}
