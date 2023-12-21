@@ -2397,24 +2397,16 @@ video {
     width: auto;
   }
 
-  .lg\:w-\[50\%\] {
-    width: 50%;
+  .lg\:w-\[200px\] {
+    width: 200px;
   }
 
-  .lg\:w-\[60\%\] {
-    width: 60%;
+  .lg\:w-\[400px\] {
+    width: 400px;
   }
 
-  .lg\:w-\[55\%\] {
-    width: 55%;
-  }
-
-  .lg\:w-\[57\%\] {
-    width: 57%;
-  }
-
-  .lg\:w-\[80\%\] {
-    width: 80%;
+  .lg\:w-\[350px\] {
+    width: 350px;
   }
 
   .lg\:max-w-\[70\%\] {
@@ -2473,58 +2465,28 @@ video {
     margin-bottom: calc(1rem * var(--tw-space-y-reverse));
   }
 
-  .lg\:space-x-\[40px\] > :not([hidden]) ~ :not([hidden]) {
+  .lg\:space-x-2 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
-    margin-right: calc(40px * var(--tw-space-x-reverse));
-    margin-left: calc(40px * calc(1 - var(--tw-space-x-reverse)));
+    margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .lg\:space-x-\[140px\] > :not([hidden]) ~ :not([hidden]) {
+  .lg\:space-x-1 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
-    margin-right: calc(140px * var(--tw-space-x-reverse));
-    margin-left: calc(140px * calc(1 - var(--tw-space-x-reverse)));
+    margin-right: calc(0.25rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.25rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .lg\:space-x-\[100px\] > :not([hidden]) ~ :not([hidden]) {
+  .lg\:space-x-5 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
-    margin-right: calc(100px * var(--tw-space-x-reverse));
-    margin-left: calc(100px * calc(1 - var(--tw-space-x-reverse)));
+    margin-right: calc(1.25rem * var(--tw-space-x-reverse));
+    margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
-  .lg\:space-x-\[90px\] > :not([hidden]) ~ :not([hidden]) {
+  .lg\:space-x-9 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
-    margin-right: calc(90px * var(--tw-space-x-reverse));
-    margin-left: calc(90px * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .lg\:space-x-\[120px\] > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(120px * var(--tw-space-x-reverse));
-    margin-left: calc(120px * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .lg\:space-x-4 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(1rem * var(--tw-space-x-reverse));
-    margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .lg\:space-x-\[30px\] > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(30px * var(--tw-space-x-reverse));
-    margin-left: calc(30px * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .lg\:space-x-\[60px\] > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(60px * var(--tw-space-x-reverse));
-    margin-left: calc(60px * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .lg\:space-x-\[80px\] > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(80px * var(--tw-space-x-reverse));
-    margin-left: calc(80px * calc(1 - var(--tw-space-x-reverse)));
+    margin-right: calc(2.25rem * var(--tw-space-x-reverse));
+    margin-left: calc(2.25rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
   .lg\:overflow-y-auto {
