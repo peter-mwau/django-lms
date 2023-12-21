@@ -3,6 +3,7 @@
 {% load courses_extras %}
 {% csrf_token %}
 {% load static %}
+{% load cache %}
 
 {% block title_name %}
   LMS - {{ course.course_name }}
@@ -61,8 +62,13 @@
             <p class="text-cyan-950 text-md">Watch this:</p>
             <div class="lg:m-4 lg:w-auto lg:relative">
                 <div class="lesson-video-container">
-                    <div id="text-red-700" class="mb-2">{{ lesson.video }}</div>
-                    <div id="player{{ lesson.id }}" class="lg:rounded-xl rounded-sm lg:m-2 lg:w-[700px] h-[200px] lg:h-[400px] w-[320px] left-0"></div>
+                    <div id="text-red-700" class="mb-2"> {{ lesson.video }}</div>
+
+                    <div id="player{{ lesson.id }}" class="rounded-xl"></div>
+                    {% if video_completion_status %}
+                    <!-- Display completion indicator or text -->
+                    <p class="text-green-500">Video Completed</p>
+                {% endif %}
                 </div>   
             </div>
             
@@ -155,6 +161,7 @@
                 {% endfor %}
             </ul>
         </div>
+        
     {% endif %}
 {% endif %}
 </div>
@@ -179,6 +186,41 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const markLessonButtons = document.querySelectorAll('.mark-lesson-button');
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+  function toggleChapter(id) {
+      const chapter = document.getElementById(id);
+      chapter.classList.toggle('hidden');
+  }
+     // Initialize the progress based on the number of lessons
+     const totalLessons = {{ total_lessons }};
+     console.log("Total Lessons:", totalLessons)
+     const progressBar = document.getElementById('progressBar');
+     const lessonRadioButtons = document.querySelectorAll('.lessonRadio');
+  
+ function updatechecked(button){
+   
+    // Fetch the completed lessons count via AJAX
+    const courseId = parseInt('{{ course.pk }}');
+    console.log('Course ID:', courseId);
+    const lessonIdsDiv = document.getElementById('lessonIds');
+    const completedLessonIds = JSON.parse(lessonIdsDiv.getAttribute('data-lesson-id'));
+    console.log(lessonIds)
+    console.log(completedLessonIds)
 
         markLessonButtons.forEach((markLessonButton) => {
             markLessonButton.addEventListener('click', function (event) {
@@ -389,7 +431,6 @@
 </script>
 
 <!-- Include your JavaScript file that uses lessonData -->
-<script src="{% static 'js/player.js' %}"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
  <script>
 function onYouTubeIframeAPIReady() {
@@ -397,18 +438,33 @@ function onYouTubeIframeAPIReady() {
     console.log("Youtube API Ready");
     console.log(players);
 }
-{% comment %} <script src="https://www.youtube.com/iframe_api"></script> {% endcomment %}
-{% comment %} <script> {% endcomment %}
-  console.log("Before loading YouTube API");
 
-  // Load YouTube API
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    console.log("Before loading YouTube API");
 
-  function onYouTubeIframeAPIReady() {
-      console.log("YouTube API Ready");
+    // Load YouTube API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function onYouTubeIframeAPIReady() {
+        console.log("YouTube API Ready");
 
       // Define lessonData as a JavaScript variable and populate it with data from Django template
       var lessonData = [
@@ -425,9 +481,7 @@ function onYouTubeIframeAPIReady() {
       ];
 
       console.log("Lesson Data:", lessonData);
-
         var players = {}; // This object will store all of the YouTube players
-        var progressInterval; // This variable will be used to store the interval for updating progress
       // Function to initialize YouTube players
       function initializeYouTubePlayers() {
         for (var i = 0; i < lessonData.length; i++) {
@@ -450,56 +504,47 @@ function onYouTubeIframeAPIReady() {
     
 }
 
-function updateLessonProgress(lessonId) {
-    const player = players[lessonId];
-    if (player) {
-        const currentTime = player.getCurrentTime();
-        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+ function onPlayerReady(event) {
+    const lessonId = event.target.getVideoData().video_id;
+} 
+function onPlayerStateChange(event) {
+    const videoId = event.target.getVideoData().video_id;  // Use "videoId" instead of "VideoId"
+    const playerState = event.data;
 
+    // Assuming that a user should be considered to have completed the lesson
+    // if they have watched at least 75% of the video
+    if (playerState === YT.PlayerState.ENDED || playerState === YT.PlayerState.PAUSED) {
+        const currentTime = event.target.getCurrentTime();
+        const totalDuration = event.target.getDuration();
+        const progressPercentage = (currentTime / totalDuration) * 100;
+        
         // Send an AJAX POST request to update the progress
+        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+        // Now you can send the progress information to your backend or handle it as needed
+        console.log(`Video ID: ${videoId}, Progress: ${progressPercentage}%`);
+
         fetch('/courses/update_video_progress/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'X-CSRFToken': csrfToken,
             },
-            body: `lesson_id=${lessonId}&current_time=${currentTime}`,
+            body: JSON.stringify({
+                video_id: videoId,  // Use "video_id" instead of "VideoId"
+                progress: progressPercentage, 
+            }),
         })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data.message); // Log the response message
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response if needed
+            console.log('Progress update successful:', data);
+        })
+        .catch(error => {
+            console.error('Error updating progress:', error);
+        });
     }
 }
-
-
-function onPlayerReady(event) {
-    const lessonId = event.target.getVideoData().video_id;
-
-    // Check if the player state is PLAYING before starting progress tracking
-    if (event.target.getPlayerState() === YT.PlayerState.PLAYING) {
-        startProgressTracking(lessonId);
-    }
-}
-function startProgressTracking(lessonId) {
-    // Remove the 'var' keyword to update the global progressInterval variable
-    progressInterval = setInterval(() => {
-        updateLessonProgress(lessonId);
-    }, 10000); // Update progress every 10 seconds (adjust as needed)
-    console.log("Progress Interval:", progressInterval);
-  }
-
-function onPlayerStateChange(event) {
-    const lessonId = event.target.getVideoData().video_id;
-
-    if (event.data === YT.PlayerState.ENDED || event.data === YT.PlayerState.PAUSED) {
-        clearInterval(progressInterval); // Stop progress tracking when the video ends or is paused
-        updateLessonProgress(lessonId);
-    }
-}    
   </script>
-  
+  {% comment %} {% endcache %}
+  {% endcache %} {% endcomment %}
 {% endblock main_content %}

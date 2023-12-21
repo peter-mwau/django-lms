@@ -10,6 +10,7 @@ class Course(models.Model):
     course_description = models.TextField()
     teacher = models.ForeignKey(User, related_name="course", on_delete=models.CASCADE)
     students = models.ManyToManyField(User, through='Enrollment', related_name="student_course")
+    picture = models.ImageField(upload_to="course_pictures", null=True, blank=True)
 
     def total_quizzes(self):
         return self.chapters.aggregate(total_quizzes=models.Count('chapter_quizzes'))['total_quizzes']
@@ -77,7 +78,7 @@ class CompletedLesson(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     completed_at = models.DateTimeField(auto_now_add=True)
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, null=True, blank=True)
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, blank=True)
 
     class Meta:
         unique_together = ('user', 'lesson')

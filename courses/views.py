@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect,HttpResponseRedirect
 import datetime
 from django.contrib.auth.mixins import (LoginRequiredMixin,
                                         PermissionRequiredMixin)
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.urls import reverse
 from django.contrib import messages
 from django.views import generic
@@ -58,7 +60,7 @@ class CreateChapterView(LoginRequiredMixin, generic.CreateView):
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs.update({'user': self.request.user})
         return kwargs
     
     
@@ -100,7 +102,7 @@ class CreateLessonView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
     def get_success_url(self) -> str:
         return reverse('courses:list')
-    
+
 class CourseDetail(generic.DetailView):
     model = Course
     
@@ -288,7 +290,6 @@ class CourseDetail(generic.DetailView):
             #this is how i choose to update to the db that a user has completed a course
             # popup a congratulations window with instructions to generate/get your certificate
             # Check if the user has already completed the course
-            print(user_id, course)
             if not CompletedCourse.objects.filter(user_id=user_id, course=course).exists():
                 # Create a new CompletedCourse instance only if it doesn't exist
                 try:
@@ -336,6 +337,25 @@ class ListCourse(generic.ListView):
         if not course_list:
             messages.info(self.request, 'No courses available at the moment.')
 
+        return context
+class CourseInfoView(generic.DetailView):
+    model = Course
+    template_name = 'courses/course_info.html'
+    context_object_name = 'course'
+
+    def get_context_data(self, **kwargs):
+        try:
+            course = get_object_or_404(Course, pk=self.kwargs['pk'])
+        except Http404:
+            # Handle the case where the course does not exist
+            messages.error(self.request, 'Course not found.')
+            return HttpResponseRedirect(reverse('courses:list'))
+        context = super().get_context_data(**kwargs)
+        chapter = Chapter.objects.filter(course=course)
+       
+
+        context['chapters'] = self.object.chapters.all()
+        context['course'] = course
         return context
 
 
@@ -446,6 +466,8 @@ def profile_view(request):
         # Handle the case where the user is not authenticated or not of type 1
         return render(request, 'user_profile.html')
         
+
+   
 def certificate_view(request, course_id):
     user = request.user
     course = get_object_or_404(Course, pk=course_id)
@@ -576,16 +598,51 @@ def mark_lesson_as_complete(request):
 @csrf_protect
 def update_video_progress(request):
     if request.method == 'POST':
-        video_id = request.POST.get('video_id')
-        progress = request.POST.get('progress')
-        video_lesson = VideoLesson.objects.get(video_lesson_id=video_id)    
-        # Find the VideoProgress object for the specified video_id and update the progress
-        video_progress, created = VideoProgress.objects.get_or_create(video_lesson=video_lesson, user=request.user)
-        video_progress.progress = progress
-        if float(progress) == 75:
-            video_progress.status = True
-        video_progress.save()
-        
-        return JsonResponse({'message': 'Video progress updated successfully.'})
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+            video_id = data.get('video_id')
+            progress = data.get('progress')
+
+            # Find the VideoLesson object for the specified video_id
+            video_lesson = VideoLesson.objects.get(video_lesson_id=video_id)
+
+            # Find the VideoProgress object for the specified video_lesson and user
+            video_progress, created = VideoProgress.objects.get_or_create(video_lesson=video_lesson, user=request.user)
+
+            # Check if the progress is 75% and update the status only if it's not already True
+            if float(progress) > 75 and not video_progress.status:
+                video_progress.status = True
+
+                # Update the progress only if the status was not already True
+                video_progress.progress = progress
+
+                # Save the VideoProgress object
+                video_progress.save()
+
+                # Include the status in the response
+                response_data = {
+                    'message': 'Video progress updated successfully.',
+                    'status': video_progress.status,
+                }
+
+                return JsonResponse(response_data)
+            else:
+                # Progress is less than 75% or status is already True, no update needed
+                response_data = {
+                    'message': 'Video progress not updated.',
+                    'status': video_progress.status,
+                }
+
+                return JsonResponse(response_data)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'message': 'Invalid JSON data.'}, status=400)
+        except VideoLesson.DoesNotExist:
+            return JsonResponse({'message': 'Video lesson not found.'}, status=404)
 
     return JsonResponse({'message': 'Invalid request method.'}, status=400)
+
+def achievements(request):
+    completed_courses = CompletedCourse.objects.filter(user=request.user)
+    print(completed_courses)
+    return render(request, 'courses/achievements.html', {'completed_courses': completed_courses})

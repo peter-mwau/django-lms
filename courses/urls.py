@@ -4,13 +4,16 @@ from courses import views
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.decorators.cache import cache_page
 
 app_name = "courses"
 
 urlpatterns = [
     re_path(r'^new/$', views.CreateCourse.as_view(), name="create"),
-    re_path(r'^detail/(?P<pk>[-\w]+)/$', views.CourseDetail.as_view(), name='detail'),
+    # re_path(r'^detail/(?P<pk>[-\w]+)/$', views.CourseDetail.as_view(), name='detail'),
+    path("detail/<int:pk>/", views.CourseDetail.as_view(), name="detail"),
     path('all/', views.ListCourse.as_view(), name="list"),
+    path('course_info/<int:pk>/', views.CourseInfoView.as_view(), name='course_info'),
     re_path(r'^enroll/(?P<pk>[-\w]+)/$', views.EnrollCourse.as_view(), name='enroll'),
     re_path(r'^unenroll/(?P<pk>[-\w]+)/$', views.UnenrollCourse.as_view(), name='unenroll'),
     path('create_chapter/', views.CreateChapterView.as_view(), name='create_chapter'),
@@ -24,6 +27,8 @@ urlpatterns = [
     path('certificate/<int:course_id>/', views.certificate_view, name='certificate'),
     path('update_video_progress/', views.update_video_progress, name='update_video_progress'),
     path('verify_certificate/', views.verify_certificate, name='verify_certificate'),
+    path('achievements/', views.achievements, name='achievements'),
+    
 ]
 
 if settings.DEBUG:

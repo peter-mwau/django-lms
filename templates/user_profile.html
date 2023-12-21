@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static tailwind_tags %}
+{% load static %}
+
 
 
 
@@ -12,7 +14,12 @@
 {% block body_content %}
     <div class="lg:mt-[150px] lg:m-2 mt-[120px] lg:ml-[470px] lg:w-[57%] w-auto absolute lg:relative left-2 text-cyan-950 font-serif bg-transparent overflow-auto lg:h-auto h-auto">
         {% if user.is_authenticated %}
+        {% if user.profile.picture %}
+        <img src="{{ user.profile.picture.url }}" alt="User Picture" class="rounded-full h-[100px] mb-4">
+        
+        {% else %}
             <i class="fa fa-user-circle-o fa-5x" aria-hidden="true"></i>
+        {% endif %}
             {% comment %} <p>{{ user.}}</p> {% endcomment %}
             <h1 class="text-3xl font-semibold">Username: {{user.username}}</h1>
             <h4 class="text-xl font-semibold">First Name: {{user.first_name}}</h4>
@@ -36,9 +43,18 @@
                         <div class="bg-white bg-opacity-40 m-2 shadow-lg rounded-md" style="width: 20rem">
                             <div class="card-image">
                                 <!-- Place your image here -->
-                                <img src="{% static 'django_lms/images/web5.jpg' %}" alt="Course Image" class="w-full h-50 object-cover rounded-t-md" />
-                              </div>
+                                {% comment %} <img src="{% static 'django_lms/images/web5.jpg' %}" alt="Course Image" class="w-full h-50 object-cover rounded-t-md" /> --> {% endcomment %}
+                                {% if course.picture %}
+
+                                <img src="{{ course.picture.url }}" alt="{{ course.course_name }}" class="card-img-top">
+                                {% else %}
+                                <!-- Default image or placeholder if no picture is available -->
+                                <img src="{% static 'django_lms/images/web5.jpg' %}" alt="Default Image" class="card-img-top">
+                                {% endif %}
+                            </div>
                             <div class="card-body p-4">
+                            
+
                             <h5 class="card-title">{{course.course_name}}</h5>
                             <h6 class="card-subtitle mb-2 text-muted">{{course.teacher}}</h6>
                             {% comment %} <p class="card-text">
