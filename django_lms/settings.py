@@ -169,7 +169,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_lms3',
         'USER': 'root',
-        'PASSWORD': 'lms123',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '3306',
     }

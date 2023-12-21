@@ -12,7 +12,7 @@
     
 
 {% block body_content %}
-    <div class="lg:mt-[150px] lg:m-2 mt-[120px] lg:ml-[470px] lg:w-[57%] w-auto absolute lg:relative left-2 text-cyan-950 font-serif bg-transparent overflow-auto lg:h-auto h-auto">
+    <div class="lg:mt-[150px] lg:m-2 mt-[130px] lg:ml-[470px] lg:w-[57%] w-auto absolute lg:relative left-2 text-cyan-950 font-serif bg-transparent overflow-auto lg:h-auto h-auto">
         {% if user.is_authenticated %}
         {% if user.profile.picture %}
         <img src="{{ user.profile.picture.url }}" alt="User Picture" class="rounded-full h-[100px] mb-4">
